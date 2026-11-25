@@ -1,0 +1,28 @@
+name: 币安带单 QQ 邮箱提醒
+
+on:
+  schedule:
+    - cron: '2-57/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: binance-monitor
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: 读取监控程序
+        uses: actions/checkout@v6
+      - name: 读取币安记录并处理邮件
+        env:
+          QQ_EMAIL: ${{ secrets.QQ_EMAIL }}
+          QQ_SMTP_CODE: ${{ secrets.QQ_SMTP_CODE }}
+          # Only deliberate manual runs send a test email or establish a new baseline.
+          MONITOR_MODE: ${{ github.event_name == 'workflow_dispatch' && 'test' || 'monitor' }}
+        run: python3 github_monitor.py --mode "$MONITOR_MODE" --worktree "$RUNNER_TEMP/binance-monitor-state"
