@@ -12,6 +12,7 @@ on:
         options:
           - test
           - diagnose
+          - preview
 
 permissions:
   contents: write
@@ -43,8 +44,28 @@ jobs:
                   raise SystemExit(f"QQ 邮箱 SMTP 返回 {status}")
           print("QQ 邮箱 SMTP 已通过 TLS 连通")
           PY
+      - name: 发送一条最新操作作为测试
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'preview' }}
+        env:
+          QQ_EMAIL: ${{ secrets.QQ_EMAIL }}
+          QQ_SMTP_CODE: ${{ secrets.QQ_SMTP_CODE }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from binance_alert import DEFAULT_PORTFOLIO, fetch_records, message_text, set_up_sender
+
+          if not all(os.environ.get(name, "").strip() for name in ("QQ_EMAIL", "QQ_SMTP_CODE")):
+              raise SystemExit("请先配置 QQ_EMAIL 和 QQ_SMTP_CODE")
+          latest = next(fetch_records(DEFAULT_PORTFOLIO, 7), None)
+          if latest is None:
+              raise SystemExit("最近七天没有可用的公开记录")
+          details = message_text([latest], DEFAULT_PORTFOLIO)
+          send = set_up_sender(True, False)
+          print(send("【测试】熬鹰资本最新带单记录", "手动发送的最新公开记录。\n\n" + details))
+          print(details)
+          PY
       - name: 读取币安记录并处理邮件
-        if: ${{ github.event_name == 'schedule' || inputs.mode != 'diagnose' }}
+        if: ${{ github.event_name == 'schedule' || inputs.mode == 'test' }}
         env:
           QQ_EMAIL: ${{ secrets.QQ_EMAIL }}
           QQ_SMTP_CODE: ${{ secrets.QQ_SMTP_CODE }}
