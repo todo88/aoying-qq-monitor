@@ -13,6 +13,7 @@ on:
           - test
           - diagnose
           - preview
+          - monitor
 
 permissions:
   contents: write
@@ -65,10 +66,10 @@ jobs:
           print(details)
           PY
       - name: 读取币安记录并处理邮件
-        if: ${{ github.event_name == 'schedule' || inputs.mode == 'test' }}
+        if: ${{ github.event_name == 'schedule' || inputs.mode == 'test' || inputs.mode == 'monitor' }}
         env:
           QQ_EMAIL: ${{ secrets.QQ_EMAIL }}
           QQ_SMTP_CODE: ${{ secrets.QQ_SMTP_CODE }}
           # Only deliberate manual runs send a test email or establish a new baseline.
-          MONITOR_MODE: ${{ github.event_name == 'workflow_dispatch' && 'test' || 'monitor' }}
+          MONITOR_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'test' && 'test' || 'monitor' }}
         run: python3 github_monitor.py --mode "$MONITOR_MODE" --worktree "$RUNNER_TEMP/binance-monitor-state"
