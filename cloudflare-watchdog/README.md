@@ -10,7 +10,7 @@
    - **Repository access → Only select repositories** 只勾选 `aoying-qq-monitor`。
    - **Repository permissions → Actions** 选择 **Read and write**。GitHub 自动添加的 **Metadata: Read** 保留即可。
    - 点 **Generate token** 并复制凭证。凭证只粘贴到 Cloudflare 的 Secret 中。
-2. 打开 [Cloudflare 控制台](https://dash.cloudflare.com/)，进入 **Workers & Pages → Create application → Import a repository**。选择 GitHub，授权时只选 `todo88/aoying-qq-monitor`。
+2. 打开 [Cloudflare 控制台](https://dash.cloudflare.com/)，进入 **Workers & Pages → Create application → GitHub**，授权时只选 `todo88/aoying-qq-monitor`。
    - 分支选择 `main`，**Root directory** 填 `cloudflare-watchdog`。
    - **Deploy command** 保持 `npx wrangler deploy`，部署到 Workers 免费方案。
    - Worker 名称是 `aoying-qq-watchdog`。部署配置会建立每 5 分钟一次的定时触发器。
