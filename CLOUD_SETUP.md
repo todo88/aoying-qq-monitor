@@ -10,3 +10,5 @@ GitHub Actions 每 5 分钟计划检查一次币安公开操作记录。GitHub �
 邮箱地址和 SMTP 授权码只填入 Secrets。去重和待发送记录保存在独立的 `monitor-state` 分支，该分支只包含币安公开记录和程序状态。
 
 如果运行失败，在 Actions 点进失败的那一轮，展开「读取币安记录并处理邮件」查看报错。[GitHub 定时任务说明](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)
+
+如需使用独立定时器补触发，可按 [Cloudflare 备用定时设置](cloudflare-watchdog/README.md) 连接 Workers 免费版。

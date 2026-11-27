@@ -69,8 +69,7 @@ def run_cycle(db, pid, mode, send, persist):
     prepare_state(db)
     state = db.execute("SELECT latest_scan FROM monitor WHERE portfolio = ?", (pid,)).fetchone()
     if mode == "monitor" and state is None:
-        logging.info("等待首次手动测试。测试通过之前，定时任务保持待命。")
-        return
+        raise SystemExit("尚未建立监控基准，请先手动运行 test 模式")
 
     end = now_ms()
     records = snapshot(db, pid, end)
@@ -112,10 +111,7 @@ def main():
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 
     if not all(os.environ.get(key, "").strip() for key in ("QQ_EMAIL", "QQ_SMTP_CODE")):
-        if args.mode == "test":
-            parser.error("先在 GitHub Actions Secrets 中设置 QQ_EMAIL 和 QQ_SMTP_CODE")
-        logging.info("等待邮箱配置。")
-        return
+        parser.error("先在 GitHub Actions Secrets 中设置 QQ_EMAIL 和 QQ_SMTP_CODE")
     email_sender = set_up_sender(True, False)
     repository = Path(__file__).resolve().parent
     prepare_worktree(repository, args.worktree)
